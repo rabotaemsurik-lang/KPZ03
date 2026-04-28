@@ -1,6 +1,6 @@
 <?php
 
-//ПАТЕРН СТАН
+// 1. ПАТЕРН СТАН
 interface NodeState {
     public function render(LightNode $node): string;
 }
@@ -17,33 +17,46 @@ class HiddenState implements NodeState {
     }
 }
 
-// БАЗОВИЙ КЛАС
+// БАЗОВИЙ КЛАС - тут у мене шаблониий метод
 abstract class LightNode {
     protected $state;
 
     public function __construct() {
         $this->state = new ActiveState();
     }
-
     public function setState(NodeState $state) {
         $this->state = $state;
     }
 
-    public function renderOuter(): string {
-        return $this->state->render($this);
+    public final function renderOuter(): string {
+        $this->onBeforeRender();
+        $result = $this->state->render($this);
+
+        $this->onAfterRender();
+
+        return $result;
     }
+
+    // Методи хуки
+    protected function onBeforeRender(): void {}
+    protected function onAfterRender(): void {}
 
     abstract public function defaultRender(): string;
     abstract public function getNodeInfo(): string;
 }
 
-// КЛАСИ ВУЗЛІВ
+//КЛАСИ ВУЗЛІВ - Використовують хуки, але за побреби
 class LightTextNode extends LightNode {
     private $text;
     public function __construct($t) {
         parent::__construct();
         $this->text = $t;
     }
+
+    protected function onBeforeRender(): void {
+        echo "   [LOG]: Текстовий вузол готується до виводу...\n";
+    }
+
     public function defaultRender(): string { return $this->text; }
     public function getNodeInfo(): string { return "TextNode: '{$this->text}'"; }
 }
@@ -54,6 +67,10 @@ class LightElementNode extends LightNode {
     public function __construct($t, $d, $s = false, $c = []) {
         parent::__construct();
         $this->tag = $t; $this->display = $d; $this->single = $s; $this->classes = $c;
+    }
+
+    protected function onBeforeRender(): void {
+        echo "[LOG]: Початок рендерингу елемента <{$this->tag}>\n";
     }
 
     public function addChild(LightNode $n) { $this->children[] = $n; }
@@ -120,14 +137,8 @@ class HtmlEditor {
 }
 
 
-echo "--- Тест патерна State ---\n";
+echo "--- Тест патерна Template Method ---\n";
 $root = new LightElementNode("div", "block", false, ["container"]);
-$text = new LightTextNode("Цей текст можна приховати");
+$text = new LightTextNode("Текст з логуванням");
 $root->addChild($text);
-
-echo "1. Стан за замовчуванням (Active):\n";
-echo $root->renderOuter();
-
-echo "\n2. Змінюємо стан тексту на Hidden:\n";
-$text->setState(new HiddenState());
 echo $root->renderOuter();
