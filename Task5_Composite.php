@@ -63,7 +63,6 @@ class DepthFirstIterator implements HtmlIterator {
 
         if ($current instanceof LightElementNode) {
             $children = $current->getChildren();
-            // Додаємо в стек з кінця, щоб обхід йшов зліва направо
             for ($i = count($children) - 1; $i >= 0; $i--) {
                 $this->stack[] = $children[$i];
             }
