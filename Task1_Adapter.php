@@ -3,21 +3,19 @@
 // Базовий логер (цільовий інтерфейс)
 class Logger {
     public function log($message) {
-        echo "\033[32m[ЛОГ]: $message\033[0m\n"; // Зелений
+        echo "\033[32m[ЛОГ]: $message\033[0m\n";
     }
     public function error($message) {
-        echo "\033[31m[ПОМИЛКА]: $message\033[0m\n"; // Червоний
+        echo "\033[31m[ПОМИЛКА]: $message\033[0m\n";
     }
     public function warn($message) {
-        echo "\033[33m[ПОПЕРЕДЖЕННЯ]: $message\033[0m\n"; // Жовтий
+        echo "\033[33m[ПОПЕРЕДЖЕННЯ]: $message\033[0m\n";
     }
 }
 
 // Клас, який ми адаптуємо
 class FileWriter {
-    public function write($text) {
-        echo "Запис тексту у файл: $text";
-    }
+
     public function writeLine($text) {
         echo "Запис рядка у лог-файл: $text" . PHP_EOL;
     }
